@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+#define INC ++*ptr;
+#define DEC --*ptr;
+#define MVR ++ptr;
+#define MVL --ptr;
+#define SOL while(*ptr){
+#define EOL }
+#define PTC putchar(*ptr);
+#define GTC *ptr=getchar();
+
+#brainfuck SIZE
+#brainfuck POS
+
+int main(){
+    char array[SIZE]={0};
+    char *ptr=array+POS;
+    #brainfuck CODE
+}

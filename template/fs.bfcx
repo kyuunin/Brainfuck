@@ -1,0 +1,19 @@
+#include <stdio.h>
+
+#define ADD(n) *ptr+=(n);
+#define MVR(n) ptr+=(n);
+#define SET(n) *ptr=(n);
+#define SCP(n, p) ptr[(p)]+=(n)*(*ptr);
+#define SOL while(*ptr){
+#define EOL }
+#define PTC putchar(*ptr);
+#define GTC *ptr=getchar();
+
+#brainfuck SIZE
+#brainfuck POS
+
+int main(){
+    char array[SIZE]={0};
+    char *ptr=array+POS;
+    #brainfuck CODE
+}
