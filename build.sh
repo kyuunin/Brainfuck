@@ -1,5 +1,8 @@
-rm ./bin/template -r
+#!/bin/bash
+
+if [ ! -d ./bin/ ] ; then
+  mkdir ./bin
+fi
 javac -d ./bin ./src/**.java
-cp ./src/template/ ./bin/template/ -r
 cd bin
 jar -cfe ../Brainfuck.jar Brainfuck ./
