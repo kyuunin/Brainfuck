@@ -14,6 +14,7 @@ public class Params implements Closeable {
 	public int pos = 50;
 	public boolean interpret = false;
 	public boolean infinity = false;
+	public boolean pbrain = false;
 
 	public final static String HELP = "-f [file name]\tSelects a file\n"
 			+ "-o [file name]\tSelects the name off the Output file\t\tDefault: file.bf\n"
@@ -24,6 +25,9 @@ public class Params implements Closeable {
 	public Params(String[] args) {
 		loop: for (int i = 0; i < args.length; i++) {
 			switch (args[i]) {
+			case "-pbrain":
+				pbrain = true;
+				break;
 			case "-t":
 				template = args[++i];
 				break;

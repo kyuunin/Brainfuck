@@ -5,7 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Brainfuck {
@@ -49,14 +52,25 @@ public class Brainfuck {
 
 	public static String loadTemplate(Params param) {
 		try (Scanner scan = new Scanner(new File(param.template))) {
-			String tmp = assembly(param);
+			String code;
+			String proce;
+			if (param.pbrain) {
+				Map<String, StringBuilder> builds = passembly(param.fileData);
+				code = builds.remove("main").toString();
+				proce = toPString(builds);
+			} else {
+				code = assembly(param.fileData);
+				proce = "";
+			}
 			StringBuilder build = new StringBuilder();
 			while (scan.hasNext()) {
 				String s = scan.nextLine();
 				if (s.contains("#brainfuck")) {
 					s = s.replaceFirst("#brainfuck SIZE", "#define SIZE " + param.size);
 					s = s.replaceFirst("#brainfuck POS", "#define POS " + param.pos);
-					s = s.replaceFirst("#brainfuck CODE", tmp);
+					s = s.replaceFirst("#brainfuck CODE", code);
+					s = s.replaceFirst("#brainfuck PROCE", proce);
+					s = s.replaceFirst("#brainfuck PBRAIN", "#define PBRAIN " + (param.pbrain ? 1 : 0));
 				}
 				build.append(s).append('\n');
 			}
@@ -66,11 +80,11 @@ public class Brainfuck {
 		}
 	}
 
-	public static String assembly(Params param) {
+	public static String assembly(Scanner fileData) {
 		StringBuilder build = new StringBuilder();
 		String buffer;
-		while (param.fileData.hasNext()) {
-			buffer = param.fileData.nextLine();
+		while (fileData.hasNext()) {
+			buffer = fileData.nextLine();
 			for (char c : buffer.toCharArray()) {
 				switch (c) {
 				case '>':
@@ -101,6 +115,91 @@ public class Brainfuck {
 			}
 		}
 		return build.toString();
+	}
+
+	private static class Tuple<A, B> {
+		A a;
+		B b;
+
+		public Tuple(A a, B b) {
+			super();
+			this.a = a;
+			this.b = b;
+		}
+	}
+
+	public static Map<String, StringBuilder> passembly(Scanner fileData) {
+
+		Random rand = new Random();
+		Map<String, StringBuilder> builders = new HashMap<>();
+		Deque<Tuple<String, StringBuilder>> buildStack = new LinkedList<>();
+		StringBuilder build = new StringBuilder();
+		String name = "main";
+
+		builders.put(name, build);
+
+		String buffer;
+		while (fileData.hasNext()) {
+			buffer = fileData.nextLine();
+			for (char c : buffer.toCharArray()) {
+				switch (c) {
+				case '>':
+					build.append("MVR ");
+					break;
+				case '<':
+					build.append("MVL ");
+					break;
+				case '+':
+					build.append("INC ");
+					break;
+				case '-':
+					build.append("DEC ");
+					break;
+				case '.':
+					build.append("PTC ");
+					break;
+				case ',':
+					build.append("GTC ");
+					break;
+				case '[':
+					build.append("SOL ");
+					break;
+				case ']':
+					build.append("EOL ");
+					break;
+				case ':':
+					build.append("RUN ");
+					break;
+				case '(':
+					buildStack.push(new Tuple<>(name, build));
+					
+					do {
+						name = String.format("fx%X", rand.nextLong());
+					} while (builders.containsKey(name));
+					
+					build.append(String.format("DEF(%s) ", name));
+					build = new StringBuilder();
+					builders.put(name, build);
+					break;
+				case ')':
+					Tuple<String, StringBuilder> tmp = buildStack.pop();
+					name = tmp.a;
+					build = tmp.b;
+					break;
+				}
+			}
+		}
+		return builders;
+	}
+
+	public static String toPString(Map<String, StringBuilder> builds) {
+		StringBuilder b = new StringBuilder();
+		builds.forEach((name, body) -> {
+			b.append(String.format("SOP(%s) ", name));
+			b.append(body);
+			b.append("EOP ");
+		});
+		return b.toString();
 	}
 
 	public static void compileC(Params param, String build) {
