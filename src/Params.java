@@ -6,9 +6,9 @@ import java.util.Scanner;
 
 public class Params implements Closeable {
 	public Scanner fileData;
-	public String out = "file.bf";
+	public String out = "a.out";
 	public String compiler = "gcc";
-	public String template = "template/fs.bfc";
+	public String template = "template/fixed.c";
 	public boolean noCompiler = false;
 	public int size = 100;
 	public int pos = 50;
@@ -36,7 +36,7 @@ public class Params implements Closeable {
 				break;
 			case "-inf":
 				infinity = true;
-				template = "template/ds.bfc";
+				template = "template/dynamic.c";
 				break;
 			case "-no-c":
 			case "--no-compiler":
